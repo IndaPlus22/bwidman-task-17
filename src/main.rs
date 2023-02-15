@@ -14,8 +14,8 @@ fn min(a: usize, b: usize, c: usize) -> usize {
 // Big inspiration from https://en.wikipedia.org/wiki/Levenshtein_distance
 fn calc_edit_distance(str1: &str, str2: &str) -> usize {
     // str1 spans the left side while str2 spans the top
-    let m = str1.len() + 1;
-    let n = str2.len() + 1;
+    let m = str1.chars().count() + 1;
+    let n = str2.chars().count() + 1;
     let mut matrix = vec![vec![0; n]; m];
 
     // Prefixes of str1 can be transformed into the empty string (0th prefix of str2)
@@ -33,7 +33,7 @@ fn calc_edit_distance(str1: &str, str2: &str) -> usize {
     for i in 1..m {
         for j in 1..n {
             let mut replace_cost = 0;
-            if str1.as_bytes()[i - 1] != str2.as_bytes()[j - 1] { // If 
+            if str1.chars().nth(i - 1) != str2.chars().nth(j - 1) { // If the current last letters are not the same
                 replace_cost = 1;
             }
 
