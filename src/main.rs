@@ -1,6 +1,10 @@
+// Solution to Kattis problem "Rättstavning"
+// Author: Benjamin Widman (bwidman)
 use std::io;
+use std::io::prelude::*;
 use core::cmp;
 
+// Minimum of three values
 fn min(a: usize, b: usize, c: usize) -> usize {
     cmp::min(a, cmp::min(b, c))
 }
@@ -33,6 +37,7 @@ fn calc_edit_distance(str1: &str, str2: &str) -> usize {
                 replace_cost = 1;
             }
 
+            // This cell's edit distance is the minimum out of the three possible edits
             matrix[i][j] = min(
                 matrix[i - 1][j] + 1,                 // Deletion
                 matrix[i][j - 1] + 1,                // Insertion
@@ -59,21 +64,25 @@ fn main() {
     }
 
     // Get misspelled words
-    let lines = io::stdin()
+    let lines = io::stdin().lock()
         .lines()
         .map(|x| x.unwrap());
 
     for misspelled_word in lines {
         let mut shortest_distance = usize::MAX;
-        let mut matching_words: Vec<String> = vec![];
+        let mut matching_words: Vec<String> = vec![]; // Words with lowest edit distance
 
         // Calculate edit distance between misspelled word and every word in the word list
-        // Find the ones with the lowest edit distance
+        // Save the ones with the lowest edit distance
         for word in &word_list {
             let distance = calc_edit_distance(&misspelled_word, word);
 
             if distance <= shortest_distance {
-                shortest_distance = distance;
+                // Clear previous matches words if new shortest edit distance is found
+                if distance < shortest_distance {
+                    matching_words.clear();
+                    shortest_distance = distance; // Update shortest distance
+                }
                 matching_words.push(word.to_string());
             }
         }
