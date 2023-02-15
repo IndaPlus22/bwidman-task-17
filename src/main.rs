@@ -5,34 +5,43 @@ fn min(a: usize, b: usize, c: usize) -> usize {
     cmp::min(a, cmp::min(b, c))
 }
 
+// Calculates the Levenshtein distance between two strings dynamically bottom-up instead of recursively top-down,
+// resulting in linear time complexity instead of exponential
+// Big inspiration from https://en.wikipedia.org/wiki/Levenshtein_distance
 fn calc_edit_distance(str1: &str, str2: &str) -> usize {
+    // str1 spans the left side while str2 spans the top
     let m = str1.len() + 1;
     let n = str2.len() + 1;
-    let mut matrix = vec![vec![0; m]; n];
+    let mut matrix = vec![vec![0; n]; m];
 
     // Prefixes of str1 can be transformed into the empty string (0th prefix of str2)
     // By removing all characters
     for i in 1..m {
-        matrix[0][i] = i;
-    }
-    
-    // Empty str1 can be transformed into the prefixes by adding every character
-    for i in 1..n {
         matrix[i][0] = i;
     }
+    
+    // Empty str1 can be transformed into the prefixes of str2 by adding every character
+    for j in 1..n {
+        matrix[0][j] = j;
+    }
 
-    for i in 1..n {
-        for j in 1..m {
-            let mut cost = 0;
-            if str1.as_bytes()[j] != str2.as_bytes()[i] {
-                cost = 1;
+    // Fill remaining matrix with edit distances between the substrings in matrix[i][j]
+    for i in 1..m {
+        for j in 1..n {
+            let mut replace_cost = 0;
+            if str1.as_bytes()[i - 1] != str2.as_bytes()[j - 1] { // If 
+                replace_cost = 1;
             }
 
-            matrix[j][i] = min(i, j, j + 1); // Test
+            matrix[i][j] = min(
+                matrix[i - 1][j] + 1,                 // Deletion
+                matrix[i][j - 1] + 1,                // Insertion
+                matrix[i - 1][j - 1] + replace_cost // Replacement
+            );
         }
     }
 
-    return matrix[n - 1][m - 1];
+    return matrix[m - 1][n - 1];
 }
 
 fn main() {
